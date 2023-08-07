@@ -4,11 +4,11 @@ info:
   description: API Backend for Architect Website
   version: 1.0.0
 servers:
-  - url: http://localhost:5678/api/
+  - url: http://localhost:3031/api/
 paths:
-  /users/login:
+  /auth/signup:
     post:
-      summary: Log In the user.
+      summary: Register an user.
       requestBody:
         required: true
         content:
@@ -18,55 +18,67 @@ paths:
               properties:
                 email:
                   type: string
+                  example: "john@example.com"
                 password:
                   type: string
+                  example: "password"
       responses:
         '200':
-          description: Connected
+          description: Registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User Created"
+        '400':
+          description: Bad Request
+        '500':
+          description: Unexpected Error
+  /auth/login:
+    post:
+      summary: Log in user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "john@example.com"
+                password:
+                  type: string
+                  example: "password"
+      responses:
+        '200':
+          description: Return a token with user id
           content:
             application/json:
               schema:
                 type: object
                 properties:
                   userId:
-                    type: integer
-                    format: int64
-                    example: 1
+                    type: string
+                    example: "64823857dd250780f41def6e"
                   token:
                     type: string
-                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTY1MTg3NDkzOSwiZXhwIjoxNjUxOTYxMzM5fQ.JGN1p8YIfR-M-5eQ-Ypy6Ima5cKA4VbfL2xMr2MgHm4
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        '400':
+          description: Bad Request
         '404':
           description: User not found
-        '401':
-          description: Not Authorized
-  /categories:
-    get:
-      summary: Returns all categories
-      responses:
-        '200':
-          description: Returns an array of all categories
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                      format: int64
-                      example: 1
-                    name:
-                      type: string
-                      example: "Objets"
         '500':
           description: Unexpected Error
-  /works:
+  /books:
     get:
-      summary: Returns all works
+      summary: get and modify books
       responses:
         '200':
-          description: Returns an array of all works
+          description: Return all books
           content:
             application/json:
               schema:
@@ -74,38 +86,44 @@ paths:
                 items:
                   type: object
                   properties:
-                    id:
-                      type: integer
-                      format: int64
-                      example: 1
+                    _id:
+                      type: string
+                      example: "64823857dd250780f41def6e"
+                    userId:
+                      type: string
+                      example: "64823857dd250780f41def6e"
                     title:
                       type: string
-                      example: "Abajour Tahina"
+                      example: "one piece - À l'aube d'une grande aventure"
+                    author:
+                      type: string
+                      example: "Eiichiro Oda"
                     imageUrl:
                       type: string
-                      example: "http://localhost:5678/images/abajour-tahina1651286843956.png"
-                    categoryId:
+                      example: "data:image/jpeg;base64, LzlqLzRBQ... <!-- Base64 data -->"
+                    year:
                       type: integer
                       format: int64
-                      example: 1
-                    userId:
+                      example: 1997
+                    genre:
+                      type: string
+                      example: "aventure"
+                    ratings:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          userId: string
+                          format: "64823857dd250780f41def6e"
+                          grade: 5
+                    averageRating:
                       type: integer
                       format: int64
-                      example: 1
-                    category:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                          format: int64
-                          example: 1
-                        name:
-                          type: string
-                          example: "Objets"
+                      example: 5
         '500':
           description: Unexpected Error
     post:
-     summary: Send a new Work
+     summary: 
      security:
        - BearerAuth: []
 

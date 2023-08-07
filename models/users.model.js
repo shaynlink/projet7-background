@@ -1,14 +1,8 @@
-module.exports = (sequelize, DataTypes) => {
-	const Categories = sequelize.define(
-		"categories",
-		{
-		name: {
-			type: DataTypes.STRING,
-			allowNull: false,
-			unique: true,
-			},
-		},
-		{timestamps: false}
-	)
-	return Categories
-}
+const { model, Schema } = require('mongoose');
+
+const userSchema = new Schema({
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true, unique: true }
+});
+
+module.exports = model('User', userSchema);
