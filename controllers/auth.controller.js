@@ -5,7 +5,7 @@ const Users = require('../models/users.model');
 exports.signup = async (req, res) => {
 	if(!req.body.email || !req.body.password){
 		return res.status(400).send({
-			message: "Must have email and password"
+			message: 'Must have email and password'
 		});
 	}
 	try {
@@ -28,11 +28,11 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res) => {
 	const user = await Users.findOne({ email: req.body.email });
  	if(user === null) {
-		return res.status(404).json({ error: new Error('user not found') })
+		return res.status(404).json({ error: 'user not found' })
 	} else {
 		const valid = await bcrypt.compare(req.body.password, user.password)
 		if(!valid){
-			return res.status(401).json({ error: new Error('Not Authorized') })
+			return res.status(401).json({ error: 'Not Authorized' })
 		}
 		return res.status(200).json({
 			userId: user._id,
