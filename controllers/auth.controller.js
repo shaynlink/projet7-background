@@ -1,6 +1,11 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Users = require('../models/users.model');
+const emailValidator = require('email-validator');
+const passwordValidator = require('password-validator');
+
+// Create a schema
+const schema = new passwordValidator();
 
 exports.signup = async (req, res) => {
 	if(!req.body.email || !req.body.password){
@@ -8,6 +13,21 @@ exports.signup = async (req, res) => {
 			message: 'Must have email and password'
 		});
 	}
+
+	if (!emailValidator.validate(req.body.email)) {
+		return res.status(400).send({
+			message: 'Invalid email'
+		});
+	}
+
+	const password = req.body.password;
+
+	if (!schema.validate(password)) {
+		return res.status(400).send({
+			message: 'Invalid password'
+		});
+	}
+
 	try {
 		const hash = await bcrypt.hash(req.body.password, 10)
 		const user = {
