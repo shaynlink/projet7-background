@@ -119,11 +119,25 @@ module.exports.addRating = async (req, res, next) => {
         });
     }
 
+    const ratings = book.ratings;
+
+    if (book.ratings.some(rating => rating.userId === req.body.userId)) {
+        const index = ratings.findIndex(rating => rating.userId === req.body.userId);
+        ratings[index].grade = req.body.rating;
+    } else {
+        ratings.push({
+            userId: req.body.userId,
+            grade: req.body.rating
+        });
+    }
+
     const result = await Books.updateOne(
         { _id: req.params.id },
         { 
-            $addToSet: { ratings: { userId: req.body.userId, grade: req.body.rating } },
-            $set: { averageRating: utils.calculateAverageRating(book.ratings, req.body.rating) }
+            $set: {
+                averageRating: utils.calculateAverageRating(book.ratings, req.body.rating),
+                ratings
+            }
         },
     );
 
