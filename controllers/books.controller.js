@@ -2,12 +2,14 @@ const Books = require('../models/books.model');
 const utils = require('../utils/utils');
 
 exports.getBooks = async (req, res) => {
+    // get all books
     const books = await Books.find();
     return res.status(200).json(books);
 };
 
 exports.getBestRatingBooks = async (req, res) => {
-    const books = await Books.find().sort({ rating: -1 }).limit(3);
+    // get 3 books with best averageRating
+    const books = await Books.find().sort({ averageRating: -1 }).limit(3);
 
     if (!books) {
         return res.status(404).send({
@@ -32,6 +34,7 @@ exports.getBookById = async (req, res) => {
     }
 
     try {
+        // get book by id
         const book = await Books.findById(req.params.id);
     
         if (!book) {
@@ -48,20 +51,24 @@ exports.getBookById = async (req, res) => {
     }
 }
 
-exports.addBook = async (req, res) => {    
+exports.addBook = async (req, res) => {   
+    // chek if mime type is valid 
     if (!utils.isValidMimyType(req.file.mimetype)) {
         return res.status(400).send({
             message: 'Invalid file type'
         });
     }
 
+    // transform binary image to data url
     const imageUrl = utils.transformBinaryToDataURL(req.file.mimetype, req.file.buffer);
 
+    // create new book
     const newBook = new Books({
         ...req.book,
         imageUrl: imageUrl
     });
 
+    // save book to database
     await newBook.save();
 
     res.status(200).json({ message: 'Book Created' });
@@ -71,12 +78,14 @@ exports.updateBook = async (req, res) => {
     const bookId = req.params.id;
 
     if (req.file) {
+        // check if mime type is valid
         if (!utils.isValidMimyType(req.file.mimetype)) {
             return res.status(400).send({
                 message: 'Invalid file type'
             });
         }
 
+        // transform binary image to data url
         const imageUrl = utils.transformBinaryToDataURL(req.file.mimetype, req.file.buffer);
 
         req.book = {
@@ -85,6 +94,7 @@ exports.updateBook = async (req, res) => {
         };
     }
 
+    // update book to database by id
     const result = await Books.findByIdAndUpdate(bookId, req.book, { new: true, upsert: false });
 
     if (!result) {
@@ -99,6 +109,7 @@ exports.updateBook = async (req, res) => {
 module.exports.deleteBook = async (req, res) => {
     const bookId = req.params.id;
 
+    // delete book by id
     const result = await Books.findByIdAndDelete(bookId);
 
     if (!result) {
@@ -111,6 +122,7 @@ module.exports.deleteBook = async (req, res) => {
 }
 
 module.exports.addRating = async (req, res, next) => {
+    // get book by id
     const book = await Books.findById(req.params.id);
 
     if (!book) {
@@ -121,20 +133,25 @@ module.exports.addRating = async (req, res, next) => {
 
     const ratings = book.ratings;
 
+    // check if user already rated book
     if (book.ratings.some(rating => rating.userId === req.body.userId)) {
+        // update rating
         const index = ratings.findIndex(rating => rating.userId === req.body.userId);
         ratings[index].grade = req.body.rating;
     } else {
+        // add new rating
         ratings.push({
             userId: req.body.userId,
             grade: req.body.rating
         });
     }
 
+    // update book with new rating and average rating
     const result = await Books.updateOne(
         { _id: req.params.id },
         { 
             $set: {
+                // calculate new average rating
                 averageRating: utils.calculateAverageRating(book.ratings, req.body.rating),
                 ratings
             }
@@ -147,6 +164,7 @@ module.exports.addRating = async (req, res, next) => {
         });
     }
 
+    // get book by id
     const newBook = await Books.findById(req.params.id);
 
     return res.status(200).json(newBook);

@@ -1,9 +1,13 @@
 const Books = require('../models/books.model');
 const utils = require('../utils/utils');
 
+/* check data integrity of books inputs */
+
 module.exports.addBook = (req, res, next) => {
     try {
         const book = JSON.parse(req.body.book);
+
+        // check if all fields are present
         if (
             !book.userId ||
             !book.title  ||
@@ -17,12 +21,15 @@ module.exports.addBook = (req, res, next) => {
             return res.status(400).json({ error: 'Missing fields' });
         }
 
+        // transform year from string to number
         book.year = parseInt(book.year);
 
+        // check if user is authenticated
         if (book.userId !== req.auth.userId) {
             return res.status(401).json({ error: 'Unauthorized' });
         }
 
+        // save book in request
         req.book = book;
         next();
     } catch {

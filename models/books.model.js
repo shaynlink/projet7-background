@@ -1,5 +1,6 @@
 const { model, Schema } = require('mongoose');
 
+// define the schema for our book model
 const bookSchema = new Schema({
     userId: { type: String, required: true, index: true },
     title: { type: String, required: true },

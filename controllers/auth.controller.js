@@ -8,12 +8,14 @@ const passwordValidator = require('password-validator');
 const schema = new passwordValidator();
 
 exports.signup = async (req, res) => {
+	// check if email and password are present
 	if(!req.body.email || !req.body.password){
 		return res.status(400).send({
 			message: 'Must have email and password'
 		});
 	}
 
+	// check if email is valid
 	if (!emailValidator.validate(req.body.email)) {
 		return res.status(400).send({
 			message: 'Invalid email'
@@ -22,6 +24,7 @@ exports.signup = async (req, res) => {
 
 	const password = req.body.password;
 
+	// check if password is valid
 	if (!schema.validate(password)) {
 		return res.status(400).send({
 			message: 'Invalid password'
@@ -29,12 +32,15 @@ exports.signup = async (req, res) => {
 	}
 
 	try {
+		// create hash password
 		const hash = await bcrypt.hash(req.body.password, 10)
 		const user = {
 			email: req.body.email,
 			password: hash
 		}
+		// create new user
 		const users = new Users(user);
+		// save user
 		await users.save();
 
 		return res.status(200).json({ message: 'User Created' })
@@ -46,10 +52,13 @@ exports.signup = async (req, res) => {
 }
 
 exports.login = async (req, res) => {
+	// get user by email
 	const user = await Users.findOne({ email: req.body.email });
+	// check if user exists
  	if(user === null) {
 		return res.status(404).json({ error: 'user not found' })
 	} else {
+		// check if password is valid
 		const valid = await bcrypt.compare(req.body.password, user.password)
 		if(!valid){
 			return res.status(401).json({ error: 'Not Authorized' })
