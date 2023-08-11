@@ -1,24 +1,24 @@
-# Backend Projet 7 - Mon Vieux Grimoire
+# Backend Projet 7 - Mon Vieux Grimoire
 
-## Steps
+## Steps
 
-### 1. Install dependencies
+### 1. Install dependencies
 ```
 npm install
 ```
 
-### 2. Create .env file
+### 2. Create .env file
 ```
 touch .env
 ```
 
-### 3. Add environment variables to .env file
+### 3. Add environment variables to .env file
 ```
 MONGO_URI="mongodb://127.0.0.1:27017/monVieuxGrimoire"
 TOKEN_SECRET="un token random"
 ```
 
-### 4. Run server
+### 4. Run server
 ```
 npm start
 ```
