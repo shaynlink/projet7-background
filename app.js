@@ -9,7 +9,7 @@ const swaggerDocs = yaml.load('swagger.yaml')
 const mongoose = require('mongoose');
 
 // connect to database
-mongoose.connect('mongodb://127.0.0.1:27017/monVieuxGrimoire');
+mongoose.connect(process.env.MONGO_URI);
 
 const app = express();
 
