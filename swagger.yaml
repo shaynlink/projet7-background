@@ -237,6 +237,15 @@ paths:
       security:
         - BearerAuth: []
 
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id of book
+          schema:
+            type: string
+            example: 64823857dd250780f41def6e
+
       requestBody:
         required: true
         content:
