@@ -1,10 +1,13 @@
 openapi: 3.0.0
+
 info:
   title: Architect API
   description: API Backend for Architect Website
   version: 1.0.0
+
 servers:
   - url: http://localhost:3031/api/
+
 paths:
   /auth/signup:
     post:
@@ -37,6 +40,7 @@ paths:
           description: Bad Request
         '500':
           description: Unexpected Error
+  
   /auth/login:
     post:
       summary: Log in user
@@ -73,6 +77,7 @@ paths:
           description: User not found
         '500':
           description: Unexpected Error
+
   /books:
     get:
       summary: get and modify books
@@ -85,118 +90,227 @@ paths:
                 type: array
                 items:
                   type: object
-                  properties:
-                    _id:
-                      type: string
-                      example: "64823857dd250780f41def6e"
-                    userId:
-                      type: string
-                      example: "64823857dd250780f41def6e"
-                    title:
-                      type: string
-                      example: "one piece - À l'aube d'une grande aventure"
-                    author:
-                      type: string
-                      example: "Eiichiro Oda"
-                    imageUrl:
-                      type: string
-                      example: "data:image/jpeg;base64, LzlqLzRBQ... <!-- Base64 data -->"
-                    year:
-                      type: integer
-                      format: int64
-                      example: 1997
-                    genre:
-                      type: string
-                      example: "aventure"
-                    ratings:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          userId: string
-                          format: "64823857dd250780f41def6e"
-                          grade: 5
-                    averageRating:
-                      type: integer
-                      format: int64
-                      example: 5
+                  $ref: '#/definitions/Book'
         '500':
           description: Unexpected Error
+    
     post:
-     summary: 
-     security:
-       - BearerAuth: []
+      summary:  Create a book
+      security:
+        - BearerAuth: []
 
-     requestBody:
-       required: true
-       content:
-         multipart/form-data:
-           schema:
-             type: object
-             properties:
-               image:
-                 type: string
-                 format: binary
-               title:
-                 type: string
-               category:
-                 type: integer
-                 format: int64
-     responses:
-       '201':
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: array
+              items:
+                $ref: '#/definitions/Book'
+      responses:
+       '200':
          description: Created
          content:
            application/json:
              schema:
                type: object
                properties:
-                 id:
-                   type: integer
-                   format: int64
-                 title:
+                 message:
                    type: string
-                 imageUrl:
-                   type: string
-                 categoryId:
-                   type: string
-                 userId:
-                   type: integer
-                   format: int64
+                   example: "Book Created"
        '500':
          description: Unexpected Error
        '401':
          description: Unauthorized
        '400':
          description: Bad Request
-  /works/{id}:
+  
+  /books/{id}:
+    get:
+      summary: Get a book depending on id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id of book to be fetched
+          schema:
+            type: string
+            example: 64823857dd250780f41def6e
+      responses:
+        '200':
+          description: Return a book
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/Book'
+        '500':
+          description: Unexpected Behaviour
+
+    put:
+      summary: Update a book
+      security:
+        - BearerAuth: []
+
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id of book to be updated
+          schema:
+            type: string
+            example: 64823857dd250780f41def6e
+      
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/definitions/Book'
+      responses:
+        '200':
+          description: Return a book
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Book Updated"
+        '500':
+          description: Unexpected Behaviour
+        '401':
+          description: Unauthorized
+        '400':
+          description: Bad Request
+
     delete:
-     summary: Delete a work depending on id
-     security:
-       - BearerAuth: []
-     parameters:
-       - name: id
-         in: path
-         required: true
-         description: id of work to be deleted
-         schema:
-           type: integer
-           format: int64
-           example: 1
-     responses:
-       '200':
-         description: Item Deleted
-       '401':
-         description: Unauthorized
-       '500':
-         description: Unexpected Behaviour
+      summary: Delete a book
+      security:
+        - BearerAuth: []
+
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id of book to be deleted
+          schema:
+            type: string
+            example: 64823857dd250780f41def6e
+      responses:
+        '200':
+          description: Return a book
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Book Deleted"
+        '500':
+          description: Unexpected Behaviour
+        '401':
+          description: Unauthorized
+        '400':
+          description: Bad Request
+  
+  /books/bestrating:
+    get:
+      summary: Get 3 of the best rated books
+      responses:
+        '200':
+          description: Return 3 books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  $ref: '#/definitions/Book'
+        '500':
+          description: Unexpected Behaviour
+  
+  /books/{id}/rating:
+    post:
+      summary: Rate a book
+      security:
+        - BearerAuth: []
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  example: 64823857dd250780f41def6e
+                rating:
+                  type: integer
+                  example: 5
+
+      responses:
+        '200':
+          description: Return a book
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/Book'
+        '500':
+          description: Unexpected Behaviour
+        '401':
+          description: Unauthorized
+        '400':
+          description: Bad Request
 
 components:
   securitySchemes:
    BearerAuth:
      type: http
      scheme: bearer
+
 securityDefinitions:
   Bearer:
     type: JWT
     name: Authorization
     in: header
+
+definitions:
+  Book:
+    properties:
+      _id:
+        type: string
+        example: "64823857dd250780f41def6e"
+      userId:
+        type: string
+        example: "64823857dd250780f41def6e"
+      title:
+        type: string
+        example: "one piece - À l'aube d'une grande aventure"
+      author:
+        type: string
+        example: "Eiichiro Oda"
+      imageUrl:
+        type: string
+        example: "data:image/jpeg;base64, LzlqLzRBQ... <!-- Base64 data -->"
+      year:
+        type: integer
+        format: int64
+        example: 1997
+      genre:
+        type: string
+        example: "aventure"
+      ratings:
+        type: array
+        items:
+          type: object
+          properties:
+            userId: string
+            format: "64823857dd250780f41def6e"
+            grade: 5
+      averageRating:
+        type: integer
+        format: int64
+        example: 5
