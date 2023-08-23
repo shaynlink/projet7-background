@@ -51,21 +51,11 @@ exports.getBookById = async (req, res) => {
     }
 }
 
-exports.addBook = async (req, res) => {   
-    // chek if mime type is valid 
-    if (!utils.isValidMimyType(req.file.mimetype)) {
-        return res.status(400).send({
-            message: 'Invalid file type'
-        });
-    }
-
-    // transform binary image to data url
-    const imageUrl = utils.transformBinaryToDataURL(req.file.mimetype, req.file.buffer);
-
+exports.addBook = async (req, res) => {
     // create new book
     const newBook = new Books({
         ...req.book,
-        imageUrl: imageUrl
+        imageUrl: utils.getURLfromLocalFile(req)
     });
 
     // save book to database
@@ -78,19 +68,9 @@ exports.updateBook = async (req, res) => {
     const bookId = req.params.id;
 
     if (req.file) {
-        // check if mime type is valid
-        if (!utils.isValidMimyType(req.file.mimetype)) {
-            return res.status(400).send({
-                message: 'Invalid file type'
-            });
-        }
-
-        // transform binary image to data url
-        const imageUrl = utils.transformBinaryToDataURL(req.file.mimetype, req.file.buffer);
-
         req.book = {
             ...req.book,
-            imageUrl: imageUrl
+            imageUrl: utils.getURLfromLocalFile(req)
         };
     }
 
@@ -160,7 +140,7 @@ module.exports.addRating = async (req, res, next) => {
 
     if (result.modifiedCount < 1) {
         return res.status(404).send({
-            message: 'Book not found'
+            message: 'Book not modified'
         });
     }
 

@@ -1,8 +1,8 @@
 const Book = require('../models/books.model');
 
-// transformBinaryToDataURL: transform binary data to dataURL
-module.exports.transformBinaryToDataURL = (mimeType, buffer) => {
-    return `data:${mimeType};base64,${buffer.toString('base64')}`;
+// getURLfromLocalFile: get URL from local file
+module.exports.getURLfromLocalFile = (req) => {
+    return `${req.protocol}://${req.get('host')}/images/${req.file.modifiedFilename}`;
 }
 
 // isValidMimyType: check if mimeType is valid
