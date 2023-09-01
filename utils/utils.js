@@ -18,7 +18,7 @@ module.exports.isOwnerBook = async (userId, bookId) => {
 }
 
 // calculateAverageRating: calculate average rating
-module.exports.calculateAverageRating = (ratings, newRating) => {
-    const ratingsSum = ratings.reduce((acc, rating) => acc + rating.grade, 0) + newRating;
-    return (ratingsSum / (ratings.length + 1)).toFixed(2)
+module.exports.calculateAverageRating = (ratings) => {
+    const ratingsSum = ratings.reduce((acc, rating) => acc + rating.grade, 0);
+    return (ratingsSum / (ratings.length)).toFixed(2);
 }

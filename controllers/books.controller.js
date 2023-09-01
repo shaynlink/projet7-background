@@ -132,7 +132,7 @@ module.exports.addRating = async (req, res, next) => {
         { 
             $set: {
                 // calculate new average rating
-                averageRating: utils.calculateAverageRating(book.ratings, req.body.rating),
+                averageRating: utils.calculateAverageRating(ratings),
                 ratings
             }
         },
