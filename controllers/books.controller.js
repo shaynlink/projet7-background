@@ -66,12 +66,17 @@ exports.addBook = async (req, res) => {
 
 exports.updateBook = async (req, res) => {
     const bookId = req.params.id;
+    const { imageUrl: oldImageUrl } = await Books.findById(bookId, 'imageUrl');
 
     if (req.file) {
         req.book = {
             ...req.book,
             imageUrl: utils.getURLfromLocalFile(req)
         };
+
+        const isDone = await utils.deleteLocalFile(res, utils.getLocalFileFromURL(oldImageUrl));
+
+        if (!isDone) return;
     }
 
     // update book to database by id
@@ -88,6 +93,11 @@ exports.updateBook = async (req, res) => {
 
 module.exports.deleteBook = async (req, res) => {
     const bookId = req.params.id;
+    const { imageUrl: oldImageUrl } = await Books.findById(bookId, 'imageUrl');
+
+    const isDone = await utils.deleteLocalFile(res, utils.getLocalFileFromURL(oldImageUrl));
+
+    if (!isDone) return;
 
     // delete book by id
     const result = await Books.findByIdAndDelete(bookId);

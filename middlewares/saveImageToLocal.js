@@ -18,8 +18,9 @@ module.exports = async (req, res, next) => {
     const filename = req.file.originalname.split(' ').join('_');
     const filenameArray = filename.split('.');
     filenameArray.pop();
-    const filenameWithoutExtention = filenameArray.join('.');
-    const modifiedFilename = filenameWithoutExtention + '_ '+ Date.now() + '.webp';
+    // prevent filename from being too long
+    const filenameWithoutExtention = filenameArray.join('.').slice(0, 20);
+    const modifiedFilename = filenameWithoutExtention + '_' + Date.now() + '.webp';
 
     sharp(req.file.buffer)
         .toFile(
