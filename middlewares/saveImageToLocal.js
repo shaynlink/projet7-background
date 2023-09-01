@@ -3,6 +3,11 @@ const path = require('node:path');
 const utils = require('../utils/utils');
 
 module.exports = async (req, res, next) => {
+    // check if file is present
+    if (!req.file) {
+        return void next();
+    }
+
     // chek if mime type is valid 
     if (!utils.isValidMimyType(req.file.mimetype)) {
         return res.status(400).send({
